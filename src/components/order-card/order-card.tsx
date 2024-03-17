@@ -1,54 +1,66 @@
-import { FC, memo } from 'react';
+import { FC, memo, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { OrderCardProps } from './type';
+import { TIngredient } from '@utils-types';
+import { OrderCardUI } from '../ui/order-card';
+
+import { useDispatch, useSelector } from '@store';
+import { getIngredientsThunk, getIngredientsStateSelector } from '@slices';
 
 const maxIngredients = 6;
 
 export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
 
-  // const orderInfo = useMemo(() => {
-  //   if (!ingredients.length) return null;
+  const ingredients: TIngredient[] = useSelector(
+    getIngredientsStateSelector
+  ).ingredients;
 
-  //   const ingredientsInfo = order.ingredients.reduce(
-  //     (acc: TIngredient[], item: string) => {
-  //       const ingredient = ingredients.find((ing) => ing._id === item);
-  //       if (ingredient) return [...acc, ingredient];
-  //       return acc;
-  //     },
-  //     []
-  //   );
+  useEffect(() => {
+    dispatch(getIngredientsThunk());
+  }, [dispatch]);
 
-  //   const total = ingredientsInfo.reduce((acc, item) => acc + item.price, 0);
+  const orderInfo = useMemo(() => {
+    if (!ingredients.length) return null;
 
-  //   const ingredientsToShow = ingredientsInfo.slice(0, maxIngredients);
+    const ingredientsInfo = order.ingredients.reduce(
+      (acc: TIngredient[], item: string) => {
+        const ingredient = ingredients.find((ing) => ing._id === item);
+        if (ingredient) return [...acc, ingredient];
+        return acc;
+      },
+      []
+    );
 
-  //   const remains =
-  //     ingredientsInfo.length > maxIngredients
-  //       ? ingredientsInfo.length - maxIngredients
-  //       : 0;
+    const total = ingredientsInfo.reduce((acc, item) => acc + item.price, 0);
 
-  //   const date = new Date(order.createdAt);
-  //   return {
-  //     ...order,
-  //     ingredientsInfo,
-  //     ingredientsToShow,
-  //     remains,
-  //     total,
-  //     date
-  //   };
-  // }, [order, ingredients]);
+    const ingredientsToShow = ingredientsInfo.slice(0, maxIngredients);
 
-  // if (!orderInfo) return null;
+    const remains =
+      ingredientsInfo.length > maxIngredients
+        ? ingredientsInfo.length - maxIngredients
+        : 0;
 
-  // return (
-  //   <OrderCardUI
-  //     orderInfo={orderInfo}
-  //     maxIngredients={maxIngredients}
-  //     locationState={{ background: location }}
-  //   />
-  // );
+    const date = new Date(order.createdAt);
+    return {
+      ...order,
+      ingredientsInfo,
+      ingredientsToShow,
+      remains,
+      total,
+      date
+    };
+  }, [order, ingredients]);
 
-  return null;
+  if (!orderInfo) return null;
+
+  return (
+    <OrderCardUI
+      orderInfo={orderInfo}
+      maxIngredients={maxIngredients}
+      locationState={{ background: location }}
+    />
+  );
 });
