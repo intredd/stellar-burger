@@ -6,9 +6,8 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from '@store';
 import {
   getOrderThunk,
-  getIngredientsThunk,
   getOrderSelector,
-  getIngredientsStateSelector
+  getIngredientsSelector
 } from '@slices';
 
 export const OrderInfo: FC = () => {
@@ -17,14 +16,11 @@ export const OrderInfo: FC = () => {
 
   useEffect(() => {
     dispatch(getOrderThunk(orderNubmer));
-    dispatch(getIngredientsThunk());
   }, [dispatch]);
 
   const orderData = useSelector(getOrderSelector).order;
 
-  const ingredients: TIngredient[] = useSelector(
-    getIngredientsStateSelector
-  ).ingredients;
+  const ingredients: TIngredient[] = useSelector(getIngredientsSelector);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;

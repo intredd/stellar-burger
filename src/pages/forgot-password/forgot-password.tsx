@@ -1,6 +1,7 @@
-import { FC, useState, useEffect, SyntheticEvent } from 'react';
+import { FC, useState, SyntheticEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { forgotPasswordApi } from '@api';
 import { ForgotPasswordUI } from '@ui-pages';
 
 import { useSelector, useDispatch } from '@store';
@@ -17,6 +18,10 @@ export const ForgotPassword: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(clearUserError());
+  });
+
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
 
@@ -27,10 +32,6 @@ export const ForgotPassword: FC = () => {
       }
     });
   };
-
-  useEffect(() => {
-    dispatch(clearUserError());
-  }, [dispatch]);
 
   return (
     <ForgotPasswordUI

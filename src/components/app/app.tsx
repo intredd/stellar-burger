@@ -20,11 +20,27 @@ import {
   ProtectedRoute,
   Center
 } from '@components';
+import { useDispatch } from '@store';
+import {
+  getIngredientsThunk,
+  getUserStateSelector,
+  getUserThunk
+} from '@slices';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Preloader } from '../ui/preloader';
 
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const userLoading = useSelector(getUserStateSelector).isLoadong;
   const backgroundLocation = location.state?.background;
+
+  useEffect(() => {
+    dispatch(getUserThunk());
+    dispatch(getIngredientsThunk());
+  }, [dispatch]);
 
   return (
     <div className={styles.app}>
@@ -48,15 +64,13 @@ const App = () => {
             </Center>
           }
         />
-        <Route
-          element={<ProtectedRoute forAuthorized={false} redirectTo='/' />}
-        >
+        <Route element={<ProtectedRoute forAuthorized={false} />}>
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path='/reset-password' element={<ResetPassword />} />
         </Route>
-        <Route element={<ProtectedRoute forAuthorized redirectTo='/login' />}>
+        <Route element={<ProtectedRoute forAuthorized />}>
           <Route path='/profile'>
             <Route index element={<Profile />} />
             <Route path='orders' element={<ProfileOrders />} />
@@ -100,7 +114,7 @@ const App = () => {
               </Modal>
             }
           />
-          <Route element={<ProtectedRoute forAuthorized redirectTo='/login' />}>
+          <Route element={<ProtectedRoute forAuthorized />}>
             <Route
               path='/profile/orders/:number'
               element={

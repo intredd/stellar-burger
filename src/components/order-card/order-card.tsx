@@ -5,22 +5,15 @@ import { OrderCardProps } from './type';
 import { TIngredient } from '@utils-types';
 import { OrderCardUI } from '../ui/order-card';
 
-import { useDispatch, useSelector } from '@store';
-import { getIngredientsThunk, getIngredientsStateSelector } from '@slices';
+import { useSelector } from '@store';
+import { getIngredientsSelector } from '@slices';
 
 const maxIngredients = 6;
 
 export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const location = useLocation();
-  const dispatch = useDispatch();
 
-  const ingredients: TIngredient[] = useSelector(
-    getIngredientsStateSelector
-  ).ingredients;
-
-  useEffect(() => {
-    dispatch(getIngredientsThunk());
-  }, [dispatch]);
+  const ingredients: TIngredient[] = useSelector(getIngredientsSelector);
 
   const orderInfo = useMemo(() => {
     if (!ingredients.length) return null;

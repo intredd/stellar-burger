@@ -37,9 +37,7 @@ export const registerUserThunk = createAsyncThunk(
   (registerData: TRegisterData) => registerUserApi(registerData)
 );
 
-export const logoutUserThunk = createAsyncThunk('user/logout', () =>
-  logoutApi()
-);
+export const logoutUserThunk = createAsyncThunk('user/logout', logoutApi);
 
 export const updateUserThunk = createAsyncThunk(
   'user/update',
@@ -55,6 +53,8 @@ export const resetPasswordThunk = createAsyncThunk(
   'user/resetPassword',
   (data: { password: string; token: string }) => resetPasswordApi(data)
 );
+
+export const getUserThunk = createAsyncThunk('user/get', getUserApi);
 
 export const userSlice = createSlice({
   name: 'user',
@@ -156,11 +156,29 @@ export const userSlice = createSlice({
       .addCase(resetPasswordThunk.fulfilled, (state) => {
         state.isLoadong = false;
         state.error = null;
+      })
+      .addCase(getUserThunk.pending, (state) => {
+        state.isLoadong = true;
+        state.error = null;
+      })
+      .addCase(getUserThunk.rejected, (state, { error }) => {
+        state.isLoadong = false;
+        state.error = error.message as string;
+      })
+      .addCase(getUserThunk.fulfilled, (state, { payload }) => {
+        state.isLoadong = false;
+        state.error = null;
+        state.isAuthorized = true;
+        state.user = payload.user;
       });
   }
 });
 export const { clearUserError } = userSlice.actions;
-export const { getUserSelector, isAuthorizedSelector, getUserErrorSelector } =
-  userSlice.selectors;
+export const {
+  getUserStateSelector,
+  getUserSelector,
+  isAuthorizedSelector,
+  getUserErrorSelector
+} = userSlice.selectors;
 
 export default userSlice.reducer;
